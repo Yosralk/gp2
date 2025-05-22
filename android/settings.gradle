@@ -13,3 +13,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
+rootProject.name = "gp2"
+include ':app'

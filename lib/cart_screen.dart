@@ -8,27 +8,34 @@ class CartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (user == null) return Center(child: Text('يرجى تسجيل الدخول'));
+
     final cartRef = FirebaseFirestore.instance
         .collection('users')
         .doc(user!.uid)
         .collection('cart');
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('السلة'),
-      ),
+      appBar: AppBar(title: Text('السلة')),
       body: StreamBuilder<QuerySnapshot>(
         stream: cartRef.snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+
           final cartDocs = snapshot.data!.docs;
+
+          if (cartDocs.isEmpty) return Center(child: Text("السلة فارغة"));
+
           return ListView.builder(
             itemCount: cartDocs.length,
             itemBuilder: (context, index) {
-              final cartItem = cartDocs[index];
+              final item = cartDocs[index];
+              final data = item.data() as Map<String, dynamic>;
+
               return ListTile(
-                title: Text(cartItem.id),
-                subtitle: Text('الكمية: ${cartItem['quantity']}'),
-                // يمكنكِ جلب تفاصيل المنتج من مجموعة 'products' باستخدام cartItem.id
+                leading: Image.network(data['image'], width: 50, height: 50, fit: BoxFit.cover),
+                title: Text(data['name']),
+                subtitle: Text('${data['price']} دينار'),
+                trailing: Text('×${data['quantity']}'),
               );
             },
           );
